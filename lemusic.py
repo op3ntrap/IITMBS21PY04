@@ -1,4 +1,4 @@
-import heapq
+from heapq import heapify, heappop, heappush
 import sys
 from collections import defaultdict
 from typing import List, Dict
@@ -7,16 +7,23 @@ from typing import List, Dict
 def main():
 	t_: int = int(sys.stdin.readline().strip())
 	for _ in range(t_):
-		s: Dict[int, List[int]] = defaultdict(list)
-		main_s: List[int] = []
+		discography: Dict[int, List[int]] = defaultdict(list) # band wise songs
+		distinct_short_songs: List[int] = [] # shortest distinct band songs
 		ns = int(sys.stdin.readline().strip())  # total songs
-		for _ in range(ns):
-			b, l = tuple(map(int, sys.stdin.readline().strip().split(' ')))
-			heapq.heappush(s[b], l)
-		# global distinct songs with min length
-		for band in s:
-			tmp = heapq.heappop(s[band])
-			heapq.heappush(main_s, tmp)
+		# Store song lengths in band heaps
+		for a_ in range(ns):
+			band, length = map(int, sys.stdin.readline().strip().split(' '))
+			if band in discography:
+				heappush(discography[band], length)
+			else:
+				heapify(discography[band])
+				heappush(discography[band], length)
+		# Pop out the smallest song from the band heap
+		for band in discography:
+			short_song = heappop(discography[band])
+			distinct_short_songs.append(short_song)
+		# sort the distinct songs
+		distinct_short_songs.sort()
 
 		def cost(non_distinct_songs: Dict[int, List[int]],
 		         distinct_songs: List[int]):
@@ -29,7 +36,7 @@ def main():
 			print(tc)
 			return tc
 
-		cost(s, main_s)
+		cost(discography, distinct_short_songs)
 
 
 if __name__ == '__main__':
