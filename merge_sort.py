@@ -26,53 +26,56 @@ class myIO:
 
 
 io = myIO()
-# MergeSort in Python
 
 
-def mergeSort(array):
-	global inversions
-	if len(array) > 1:
+def mergesort(arr: List[int], length: int):
+	_tmp = [0] * length
+	return _ms(arr, _tmp, 0, length - 1)
 
-		#  r is the point where the array is divided into two subarrays
-		mid = len(array) // 2
-		low = array[:mid]
-		high = array[mid:]
 
-		# Sort the two halves
-		mergeSort(low)
-		mergeSort(high)
+def _ms(lst, tmp, l, hi):
+	inversions = 0
+	if l < hi:
+		mid = (l + hi) // 2
+		inversions += _ms(lst, tmp, l, mid)
+		inversions += _ms(lst, tmp, mid + 1, hi)
+		inversions += merge(lst, tmp, l, mid, hi)
+	return inversions
 
-		i = j = k = 0
-		global inversions
-		# Until we reach either end of either L or M, pick larger among
-		# elements L and M and place them in the correct position at A[p..r]
-		while i < len(low) and j < len(high):
-			if low[i] < high[j]:
-				array[k] = low[i]
-				i += 1
-			else:
-				array[k] = high[j]
-				inversions += (len(low) - i)
-				j += 1
-			k += 1
 
-		# When we run out of elements in either L or M,
-		# pick up the remaining elements and put in A[p..r]
-		while i < len(low):
-			array[k] = low[i]
+def merge(arr, tmp, l, mid, hi):
+	# i = j = k = 0
+	i = l
+	j = mid + 1
+	k = l
+
+	inv = 0
+
+	while i <= mid and j <= hi:
+		if arr[i] <= arr[j]:
+			tmp[k] = arr[i]
 			i += 1
 			k += 1
-
-		while j < len(high):
-			array[k] = high[j]
+		else:
+			tmp[k] = arr[j]
+			inv += (mid - i + 1)
 			j += 1
 			k += 1
-	# return inversions
+
+	while i <= mid:
+		tmp[k] = arr[i]
+		i += 1
+		k += 1
+	while j <= hi:
+		tmp[k] = arr[j]
+		j += 1
+		k += 1
+	for _ in range(l, hi + 1):
+		arr[_] = tmp[_]
+	return inv
 
 
-data_le = io.read_var()
-data = io.read_list()
-# invs = mergeSort(data)
-inversions = 0
-mergeSort(data)
-io.print_ans(inversions)
+# if __name__ == "__main__":
+leng = int(input())
+data = list(map(int, input().split()))
+print(mergesort(data, leng))
